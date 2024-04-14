@@ -49,10 +49,10 @@ Using Python3
 
 
 
-| Name               | email            | USC ID     |
-| ------------------ | ---------------- | ---------- |
+| Name               | email            | 
+| ------------------ | ---------------- | 
 | Vonage       |   |  |
-| Sydney Chang       | schang41@usc.edu | 5739474593 |
+| Sydney Chang       | schang41@usc.edu | 
 
 
 
