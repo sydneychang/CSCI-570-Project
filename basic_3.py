@@ -1,5 +1,12 @@
 import os
-cwd = os.path.dirname(os.path.abspath(__file__))
+cwd = os.path.dirname(os.path.abspath(__file__))    #global variables
+delta = 30
+mismatchCosts = {
+    "A": {"A": 0, "C": 110, "G" : 48, "T" : 94},
+    "C": {"A": 110, "C": 0, "G": 118, "T" : 48},
+    "G": {"A": 48, "C": 118, "G": 0, "T": 110},
+    "T": {"A": 94, "C": 48, "G": 110, "T": 0}
+}
 
 def inputStringGenerator() -> list:           #reads from txt file and creates the 2 strings of input for sequence alignment
     count = 0
@@ -30,7 +37,7 @@ if __name__ == "__main__":             #main driver
     inputString1 = inputs[0]
     inputString2 = inputs[1]
 
-    print(inputs[0] + "\n" + inputs[1])
+    #print(inputs[0] + "\n" + inputs[1])
     
-
+    
 
