@@ -39,6 +39,25 @@ def bottomUpPass() -> None:
                 memoizedArray[j-1][i] + delta,
                 memoizedArray[j][i-1] + delta
             )
+def topDownPass() -> list:
+    m, n = string1Len, string2Len
+    alignedString1, alignedString2 = "", ""
+    
+    while(m > 0 or n > 0): 
+        if memoizedArray[n][m] == memoizedArray[n-1][m-1] + mismatchCosts[inputString1[m-1]][inputString2[n-1]]:
+            alignedString1 += inputString1[m-1] 
+            alignedString2 += inputString2[n-1]
+            m -= 1   
+            n -= 1
+        elif memoizedArray[n][m] == memoizedArray[n-1][m] + delta:   #elif memoizedArray[n][m] == memoizedArray[n][m-1] + delta:
+            alignedString1 += "_"                                    #alignedString1 += inputString1[m-1]
+            alignedString2 += inputString2[n-1]                      #alignedString2 += "_"
+            n -= 1                                                   #m -= 1
+        else:
+            alignedString1 += inputString1[m-1]                      #alignedString1 += "_"
+            alignedString2 += "_"                                    #alignedString2 += inputString2[n-1]
+            m -= 1                                                   #n -= 1
+    return ["".join(reversed(alignedString1)), "".join(reversed(alignedString2))]
 
 if __name__ == "__main__":             #main driver
     inputs = inputStringGenerator()
@@ -59,47 +78,8 @@ if __name__ == "__main__":             #main driver
         memoizedArray[i][0] = i * delta
 
     bottomUpPass()
-
-    m, n = string1Len, string2Len
-    costOfAlignment = memoizedArray[n][m]                             #value of optimal solution
-    alignedString1, alignedString2 = "", ""
-    '''while(m > 0 or n > 0): 
-        if memoizedArray[n][m] == memoizedArray[n-1][m-1] + mismatchCosts[inputString1[m-1]][inputString2[n-1]]:
-            alignedString1 += inputString1[m-1] 
-            alignedString2 += inputString2[n-1]
-            m -= 1   
-            n -= 1
-        elif memoizedArray[n][m] == memoizedArray[n][m-1] + delta:
-            alignedString1 += inputString1[m-1]
-            alignedString2 += "_"
-            m -= 1
-        else:
-            alignedString1 += "_"
-            alignedString2 += inputString2[n-1]
-            n -= 1
-        valueOfOpt = memoizedArray[n][m]  #remove. for testing'''
+    alignedStrings = topDownPass()
     
-    while(m > 0 or n > 0): 
-        if memoizedArray[n][m] == memoizedArray[n-1][m-1] + mismatchCosts[inputString1[m-1]][inputString2[n-1]]:
-            alignedString1 += inputString1[m-1] 
-            alignedString2 += inputString2[n-1]
-            m -= 1   
-            n -= 1
-        elif memoizedArray[n][m] == memoizedArray[n-1][m] + delta:
-            alignedString1 += "_"
-            alignedString2 += inputString2[n-1]
-            n -= 1
-        else: #memoizedArray[n][m] == memoizedArray[n][m-1] + delta:
-            alignedString1 += inputString1[m-1]
-            alignedString2 += "_"
-            m -= 1
-
+    costOfAlignment = memoizedArray[string1Len][string2Len]                             #value of optimal solution
     print(costOfAlignment)
-    print("".join(reversed(alignedString1)))
-    print("".join(reversed(alignedString2)))
-
-    #scrappable code - just to output opt array in a readable form
-    f = open(os.path.join(cwd, "memoizedArrayOutput"), "w")
-    for row in memoizedArray: 
-        f.write(", ".join(str(x) for x in row) + "\n")
-    f.close()
+    print(alignedStrings[0] + "\n" + alignedStrings[1])
