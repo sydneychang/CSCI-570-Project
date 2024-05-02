@@ -1,4 +1,9 @@
 import os
+import sys
+from resource import * 
+import time
+import psutil
+
 cwd = os.path.dirname(os.path.abspath(__file__))    #global variables
 delta = 30                                          #gap penalty
 mismatchCosts = {                                   #alpha values
@@ -8,11 +13,25 @@ mismatchCosts = {                                   #alpha values
     "T": {"A": 94, "C": 48, "G": 110, "T": 0}
 }
 
+def process_memory() -> int:
+    process = psutil.Process() 
+    memory_info = process.memory_info()
+    memory_consumed = int(memory_info.rss/1024) 
+    return memory_consumed
+
+def time_wrapper(): 
+    start_time = time.time() 
+    bottomUpPass()
+    topDownPass()
+    end_time = time.time()
+    time_taken = (end_time - start_time)*1000 
+    return time_taken
+
 def inputStringGenerator() -> list:           #reads from txt file and creates the 2 strings of input for sequence alignment
     count = 0
     inputString1 = ""
     inputString2 = ""
-    with open(os.path.join(cwd, "SampleTestCases", "input1.txt"), "r", encoding="UTF-8") as file:
+    with open(os.path.join(cwd, "SampleTestCases", "input5.txt"), "r", encoding="UTF-8") as file:
         while line := file.readline().rstrip():
             if(line.isalpha() and not inputString1): 
                 inputString1 = line
@@ -39,6 +58,7 @@ def bottomUpPass() -> None:
                 memoizedArray[j-1][i] + delta,
                 memoizedArray[j][i-1] + delta
             )
+
 def topDownPass() -> list:
     m, n = string1Len, string2Len
     alignedString1, alignedString2 = "", ""
@@ -58,6 +78,9 @@ def topDownPass() -> list:
             alignedString2 += "_"                                    #alignedString2 += inputString2[n-1]
             m -= 1                                                   #n -= 1
     return ["".join(reversed(alignedString1)), "".join(reversed(alignedString2))]
+
+
+
 
 if __name__ == "__main__":             #main driver
     inputs = inputStringGenerator()
@@ -80,6 +103,11 @@ if __name__ == "__main__":             #main driver
     bottomUpPass()
     alignedStrings = topDownPass()
     
-    costOfAlignment = memoizedArray[string1Len][string2Len]                             #value of optimal solution
-    print(costOfAlignment)
-    print(alignedStrings[0] + "\n" + alignedStrings[1])
+    costOfAlignment = memoizedArray[string2Len][string1Len]                             #value of optimal solution
+    #write to file
+    f = open(os.path.join(cwd, "basicAlgOutput"), "w")
+    f.write("%d\n" % costOfAlignment)
+    f.write(alignedStrings[0] + "\n" + alignedStrings[1] + "\n")
+    f.write("%f\n" % time_wrapper())
+    f.write("%f\n" % process_memory())
+    f.close()
