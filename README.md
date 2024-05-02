@@ -13,8 +13,18 @@ Using Python3
 
 
 **basic version**
-- hardcode gap penalty (delta) & mismatch costs (alpha)
-- ???
+- hardcode gap penalty (delta) & mismatch costs (alpha) - dict of dicts
+- bottom up pass: 
+    - initialize first column and row based on deltas * string length (these are the costs if a given string must be aligned with an empty string)
+    - use the recurrence formula to fill out the values row by row, column by column
+    - the value of the optimal solution should be at memorizedArray[n][m]
+- top down pass: 
+    - sneaky gotchas:
+        - while loop should be "or" not "and". even if the alignment reaches the 0th column, it should continue down the rows as it needs to iterate back down to 0, 0 (and vice versa).
+        - it's ROW BY COLUMN...when accessing memorizedArray[n][m]
+        - order of if statements matter in the final alignment!! kept the alternate ordering of if statements to compare easily with outputs. note that these alignments are of the same cost and therefore equivalent
+    - started from memorizedArray[n][m] and obtained the sequence, iterating through the array back to [0][0]
+    - reversed the string to get the result
 
 **memory efficient version**
 - divide and conquer
@@ -47,12 +57,6 @@ Using Python3
 **submission**
 - double check file structure/naming format
 
-
-
-| Name               | email            | 
-| ------------------ | ---------------- | 
-| Vonage       |   |  |
-| Sydney Chang       | schang41@usc.edu | 
 
 
 
