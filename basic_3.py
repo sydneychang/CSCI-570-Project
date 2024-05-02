@@ -30,8 +30,8 @@ def time_wrapper():
 def inputStringGenerator() -> list:           #reads from txt file and creates the 2 strings of input for sequence alignment
     count = 0
     inputString1 = ""
-    inputString2 = ""
-    with open(os.path.join(cwd, "SampleTestCases", "input5.txt"), "r", encoding="UTF-8") as file:
+    inputString2 = ""        
+    with open(os.path.join(cwd, "SampleTestCases", sys.argv[1]), "r", encoding="UTF-8") as file:     #ex: 1st CLA could be "input5.txt"
         while line := file.readline().rstrip():
             if(line.isalpha() and not inputString1): 
                 inputString1 = line
@@ -80,8 +80,6 @@ def topDownPass() -> list:
     return ["".join(reversed(alignedString1)), "".join(reversed(alignedString2))]
 
 
-
-
 if __name__ == "__main__":             #main driver
     inputs = inputStringGenerator()
     inputString1 = inputs[0]
@@ -90,7 +88,7 @@ if __name__ == "__main__":             #main driver
     string1Len = len(inputString1)
     string2Len = len(inputString2)
 
-    print(inputs[0] + "\n" + inputs[1])
+    #print(inputs[0] + "\n" + inputs[1])
     
     memoizedArray = [[0 for x in range(string1Len + 1)] for y in range(string2Len + 1)]      #x = string1 length, y = string2 length
     
@@ -105,7 +103,7 @@ if __name__ == "__main__":             #main driver
     
     costOfAlignment = memoizedArray[string2Len][string1Len]                             #value of optimal solution
     #write to file
-    f = open(os.path.join(cwd, "basicAlgOutput"), "w")
+    f = open(os.path.join(cwd, sys.argv[2]), "w")                                                #ex: 2nd CLA could be basicAlgOutput.txt
     f.write("%d\n" % costOfAlignment)
     f.write(alignedStrings[0] + "\n" + alignedStrings[1] + "\n")
     f.write("%f\n" % time_wrapper())
