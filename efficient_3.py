@@ -49,6 +49,44 @@ def inputStringGenerator() -> list:           #reads from txt file and creates t
 
     return [inputString1, inputString2]
 
+def bottomUpPass(string1Len: int, string2Len: int, inputString1: str, inputString2: str) -> list: 
+    memoizedArray = [[0 for x in range(string1Len + 1)] for y in range(string2Len + 1)] 
+
+    for i in range(string1Len + 1):
+        memoizedArray[0][i] = i * delta
+
+    for i in range(string2Len + 1):
+        memoizedArray[i][0] = i * delta
+    
+    for j in range(1, string2Len + 1):                                               
+        for i in range(1, string1Len + 1):
+            memoizedArray[j][i] = min(
+                memoizedArray[j-1][i-1] + mismatchCosts[inputString2[j-1]][inputString1[i-1]],
+                memoizedArray[j-1][i] + delta,
+                memoizedArray[j][i-1] + delta
+            )
+    return memoizedArray
+
+def topDownPass(string1Len: int, optAlignmentInY: int, inputString1: str, inputString2: str, memoizedArray: list) -> list:
+    m, n = string1Len, optAlignmentInY
+    alignedString1, alignedString2 = "", ""
+    while(m > 0 or n > 0): 
+        if memoizedArray[n][m] == memoizedArray[n-1][m-1] + mismatchCosts[inputString1[m-1]][inputString2[n-1]]:
+            alignedString1 += inputString1[m-1] 
+            alignedString2 += inputString2[n-1]
+            m -= 1   
+            n -= 1
+        elif memoizedArray[n][m] == memoizedArray[n-1][m] + delta:   #elif memoizedArray[n][m] == memoizedArray[n][m-1] + delta:
+            alignedString1 += "_"                                    #alignedString1 += inputString1[m-1]
+            alignedString2 += inputString2[n-1]                      #alignedString2 += "_"
+            n -= 1                                                   #m -= 1
+        else:
+            alignedString1 += inputString1[m-1]                      #alignedString1 += "_"
+            alignedString2 += "_"                                    #alignedString2 += inputString2[n-1]
+            m -= 1       
+    return [alignedString1, alignedString2]                                            #n -= 1
+
+
 if __name__ == "__main__":             #main driver
     inputs = inputStringGenerator()
     inputString1 = inputs[0]
@@ -56,110 +94,44 @@ if __name__ == "__main__":             #main driver
 
     string1Len = len(inputString1)
     string2Len = len(inputString2)
-
-    print(inputs[0] + "\n" + inputs[1])
+    inputString1Reversed = "".join(reversed(inputString1))
+    inputString2Reversed = "".join(reversed(inputString2))
+    #print(inputs[0] + "\n" + inputs[1])
 
     #divide - half of X and all of Y
-    #first half of X
-    string1LenDivided = string1Len//2   #floor
-    memoizedArray1 = [[0 for x in range(string1LenDivided + 1)] for y in range(string2Len + 1)] 
-
-    for i in range(string1LenDivided + 1):
-        memoizedArray1[0][i] = i * delta
-
-    for i in range(string2Len + 1):
-        memoizedArray1[i][0] = i * delta
-    
-    for j in range(1, string2Len + 1):                                               
-        for i in range(1, string1LenDivided + 1):
-            memoizedArray1[j][i] = min(
-                memoizedArray1[j-1][i-1] + mismatchCosts[inputString2[j-1]][inputString1[i-1]],
-                memoizedArray1[j-1][i] + delta,
-                memoizedArray1[j][i-1] + delta
-            )
-
-    #last half of X
-    inputString1Reversed, inputString2Reversed = "".join(reversed(inputString1)), "".join(reversed(inputString2))
-    string1LenRemainder = string1Len - string1LenDivided
-    memoizedArray2 = [[0 for x in range(string1LenRemainder + 1)] for y in range(string2Len + 1)] 
-
-    for i in range(string1LenRemainder + 1):
-        memoizedArray2[0][i] = i * delta
-
-    for i in range(string2Len + 1):
-        memoizedArray2[i][0] = i * delta
-    
-    for j in range(1, string2Len + 1):                                               
-        for i in range(1, string1LenRemainder + 1):
-            memoizedArray2[j][i] = min(
-                memoizedArray2[j-1][i-1] + mismatchCosts[inputString2Reversed[j-1]][inputString1Reversed[i-1]],
-                memoizedArray2[j-1][i] + delta,
-                memoizedArray2[j][i-1] + delta
-            )
+    string1LenHalved = string1Len//2
+    string1LenRemainder = string1Len - string1LenHalved
+    memoizedArray1 = bottomUpPass(string1LenHalved, string2Len, inputString1, inputString2)                                                      #first half of X
+    memoizedArray2 = bottomUpPass(string1LenRemainder, string2Len, inputString1Reversed, inputString2Reversed)   #last half of X
     
     #add and find min for optimal splitting point (min cost of alignment for split). final col of each array contains opt costs of alignment.
     costOfAlignmentArr = []
     for i in range (string2Len +1): 
-        costOfAlignmentArr.append(memoizedArray1[i][string1LenDivided] + memoizedArray2[string2Len-i][string1LenRemainder]) #(k chars of Y) + (n-k chars of Y)
-    print(min(costOfAlignmentArr))
+        costOfAlignmentArr.append(memoizedArray1[i][string1LenHalved] + memoizedArray2[string2Len-i][string1LenRemainder]) #(k chars of Y) + (n-k chars of Y)
     costOfOptimalAlignment = min(costOfAlignmentArr)
-    print(costOfAlignmentArr.index(costOfOptimalAlignment))
     optAlignmentY1 = costOfAlignmentArr.index(costOfOptimalAlignment)
     optAlignmentY2 = string2Len - optAlignmentY1
 
-    m, n = string1LenDivided, optAlignmentY1
-    alignedString1, alignedString2 = "", ""
-    while(m > 0 or n > 0): 
-        if memoizedArray1[n][m] == memoizedArray1[n-1][m-1] + mismatchCosts[inputString1[m-1]][inputString2[n-1]]:
-            alignedString1 += inputString1[m-1] 
-            alignedString2 += inputString2[n-1]
-            m -= 1   
-            n -= 1
-        elif memoizedArray1[n][m] == memoizedArray1[n-1][m] + delta:   #elif memoizedArray[n][m] == memoizedArray[n][m-1] + delta:
-            alignedString1 += "_"                                    #alignedString1 += inputString1[m-1]
-            alignedString2 += inputString2[n-1]                      #alignedString2 += "_"
-            n -= 1                                                   #m -= 1
-        else:
-            alignedString1 += inputString1[m-1]                      #alignedString1 += "_"
-            alignedString2 += "_"                                    #alignedString2 += inputString2[n-1]
-            m -= 1                                                   #n -= 1
-    firstHalfX = "".join(reversed(alignedString1))
-    firstHalfY = "".join(reversed(alignedString2))
-    print("first half of X: " + firstHalfX)
-    print("first half of Y: " + firstHalfY)
+    #topdown for first half
+    alignedFirstHalf = topDownPass(string1LenHalved, optAlignmentY1, inputString1, inputString2, memoizedArray1)
+    firstHalfX = "".join(reversed(alignedFirstHalf[0]))
+    firstHalfY = "".join(reversed(alignedFirstHalf[1]))
 
-
-    m, n = string1LenRemainder, optAlignmentY2
-    alignedString1, alignedString2 = "", ""
-    while(m > 0 or n > 0): 
-        if memoizedArray2[n][m] == memoizedArray2[n-1][m-1] + mismatchCosts[inputString1Reversed[m-1]][inputString2Reversed[n-1]]:
-            alignedString1 += inputString1Reversed[m-1] 
-            alignedString2 += inputString2Reversed[n-1]
-            m -= 1   
-            n -= 1
-        elif memoizedArray2[n][m] == memoizedArray2[n-1][m] + delta:   #elif memoizedArray[n][m] == memoizedArray[n][m-1] + delta:
-            alignedString1 += "_"                                    #alignedString1 += inputString1[m-1]
-            alignedString2 += inputString2Reversed[n-1]                      #alignedString2 += "_"
-            n -= 1                                                   #m -= 1
-        else:
-            alignedString1 += inputString1Reversed[m-1]                      #alignedString1 += "_"
-            alignedString2 += "_"                                    #alignedString2 += inputString2[n-1]
-            m -= 1                                                   #n -= 1
-    lastHalfX = "".join((alignedString1))       #don't have to reverse bc the array had reversed X and Y already
-    lastHalfY = "".join((alignedString2))
-    print("last half of X: " + lastHalfX)
-    print("last half of Y: " + lastHalfY)
+    #topdown for last half
+    alignedLastHalf = topDownPass(string1LenRemainder, optAlignmentY2, inputString1Reversed, inputString2Reversed, memoizedArray2)
+    lastHalfX = "".join((alignedLastHalf[0]))       #don't have to reverse bc the array had reversed X and Y already
+    lastHalfY = "".join((alignedLastHalf[1]))
 
     #conquer - concatenating the string
-    print (firstHalfX + lastHalfX)
-    print (firstHalfY + lastHalfY)
+    fullyAlignedX = firstHalfX + lastHalfX
+    fullyAlignedY = firstHalfY + lastHalfY
     
-    
-    #scrappable code - just to output opt array in a readable form
-    
-    '''f = open(os.path.join(cwd, "efficientMemoizedArrayOutput"), "w")
-    for row in memoizedArray1: 
-        f.write(", ".join(str(x) for x in row) + "\n")
-    f.close()'''
+    #write to file
+    f = open(os.path.join(cwd, sys.argv[2]), "w")                                                #ex: 2nd CLA could be basicAlgOutput.txt
+    f.write("%d\n" % costOfOptimalAlignment)
+    f.write(fullyAlignedX + "\n" + fullyAlignedY + "\n")
+    f.write("%f\n" % time_wrapper())
+    f.write("%f\n" % process_memory())
+    f.close()
 
     
