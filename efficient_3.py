@@ -83,16 +83,16 @@ if __name__ == "__main__":             #main driver
         memoizedArray1[0][i] = i * delta
         memoizedArray2[0][i] = i * delta        
     
-    optimalCostsArray1 = getCostOfOptimalAlignments(string1Len, string2Len, inputString1, inputString2, memoizedArray1)   
-    print(optimalCostsArray1)                 
-    #optimalCostsArray2 = getCostOfOptimalAlignments(string1LenRemainder, string2Len, inputString1Reversed, inputString2Reversed, memoizedArray2)  
-    #add and find min for optimal splitting point (min cost of alignment for split). final col of each array contains opt costs of alignment.
-    '''costOfAlignmentArr = []
-    for i in range (string2Len +1): 
-        costOfAlignmentArr.append(memoizedArray1[i][string1LenHalved] + memoizedArray2[string2Len-i][string1LenRemainder]) #(k chars of Y) + (n-k chars of Y)
-    costOfOptimalAlignment = min(costOfAlignmentArr)
-    optAlignmentY1 = costOfAlignmentArr.index(costOfOptimalAlignment)
-    optAlignmentY2 = string2Len - optAlignmentY1'''
+    optimalCostsArray1 = getCostOfOptimalAlignments(string1LenHalved, string2Len, inputString1, inputString2, memoizedArray1)              
+    optimalCostsArray2 = getCostOfOptimalAlignments(string1LenRemainder, string2Len, inputString1Reversed, inputString2Reversed, memoizedArray2)  
+    
+    costOfFullStringAlignmentArr = []
+    for i in range (string2Len + 1):                                  #add and find min for optimal splitting point (min cost of alignment for split).
+        costOfFullStringAlignmentArr.append(optimalCostsArray1[i] + optimalCostsArray2[string2Len-i]) #(k chars of Y) + (n-k chars of Y)
+    costOfOptimalAlignment = min(costOfFullStringAlignmentArr)
+    optAlignmentY1 = costOfFullStringAlignmentArr.index(costOfOptimalAlignment)
+    optAlignmentY2 = string2Len - optAlignmentY1
+    print(costOfOptimalAlignment)
 
     #topdown for first half
     '''alignedFirstHalf = topDownPass(string1LenHalved, optAlignmentY1, inputString1, inputString2, memoizedArray1)
