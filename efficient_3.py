@@ -49,24 +49,78 @@ def inputStringGenerator() -> list:           #reads from txt file and creates t
 
     return [inputString1, inputString2]
 
-def bottomUpPass(string1Len: int, string2Len: int, inputString1: str, inputString2: str) -> list: 
-    memoizedArray = [[0 for x in range(string1Len + 1)] for y in range(string2Len + 1)] 
-
-    for i in range(string1Len + 1):
-        memoizedArray[0][i] = i * delta
-
-    for i in range(string2Len + 1):
-        memoizedArray[i][0] = i * delta
-    
-    for j in range(1, string2Len + 1):                                               
-        for i in range(1, string1Len + 1):
-            memoizedArray[j][i] = min(
-                memoizedArray[j-1][i-1] + mismatchCosts[inputString2[j-1]][inputString1[i-1]],
-                memoizedArray[j-1][i] + delta,
-                memoizedArray[j][i-1] + delta
+def getCostOfOptimalAlignments(string1Len: int, string2Len: int, inputString1: str, inputString2: str, memoizedArray: list) -> list:  #using only 2 columns, return the final col array
+    for i in range(1, string1Len + 1):
+        memoizedArray[1][0] = i * delta                        #initialize the first value of the 2nd row
+        for j in range(1, string2Len + 1):                                               
+            memoizedArray[1][j] = min(
+                memoizedArray[0][j-1] + mismatchCosts[inputString2[j-1]][inputString1[i-1]],
+                memoizedArray[0][j] + delta,
+                memoizedArray[1][j-1] + delta
             )
-    return memoizedArray
+        temp = memoizedArray[0]                     #swap array rows to build the next set of optimal values.
+        memoizedArray[0] = memoizedArray[1]
+        memoizedArray[1] = temp                     #next iteration's "bottom up pass" will overwrite the previous row
+    return memoizedArray[0]                         #the final swap puts the correct alignment costs in the 0th position
 
+if __name__ == "__main__":             #main driver
+    inputs = inputStringGenerator()
+    inputString1 = inputs[0]
+    inputString2 = inputs[1]
+
+    string1Len = len(inputString1)
+    string2Len = len(inputString2)
+    inputString1Reversed = "".join(reversed(inputString1))
+    inputString2Reversed = "".join(reversed(inputString2))
+    #print(inputs[0] + "\n" + inputs[1])
+
+    #divide - half of X and all of Y
+    string1LenHalved = string1Len//2
+    string1LenRemainder = string1Len - string1LenHalved
+    memoizedArray1 = [[0 for y in range(string2Len + 1)] for x in range(2)] 
+    memoizedArray2 = [[0 for y in range(string2Len + 1)] for x in range(2)] 
+    for i in range(string2Len + 1):
+        memoizedArray1[0][i] = i * delta
+        memoizedArray2[0][i] = i * delta        
+    
+    optimalCostsArray1 = getCostOfOptimalAlignments(string1Len, string2Len, inputString1, inputString2, memoizedArray1)   
+    print(optimalCostsArray1)                 
+    #optimalCostsArray2 = getCostOfOptimalAlignments(string1LenRemainder, string2Len, inputString1Reversed, inputString2Reversed, memoizedArray2)  
+    #add and find min for optimal splitting point (min cost of alignment for split). final col of each array contains opt costs of alignment.
+    '''costOfAlignmentArr = []
+    for i in range (string2Len +1): 
+        costOfAlignmentArr.append(memoizedArray1[i][string1LenHalved] + memoizedArray2[string2Len-i][string1LenRemainder]) #(k chars of Y) + (n-k chars of Y)
+    costOfOptimalAlignment = min(costOfAlignmentArr)
+    optAlignmentY1 = costOfAlignmentArr.index(costOfOptimalAlignment)
+    optAlignmentY2 = string2Len - optAlignmentY1'''
+
+    #topdown for first half
+    '''alignedFirstHalf = topDownPass(string1LenHalved, optAlignmentY1, inputString1, inputString2, memoizedArray1)
+    firstHalfX = "".join(reversed(alignedFirstHalf[0]))
+    firstHalfY = "".join(reversed(alignedFirstHalf[1]))
+
+    #topdown for last half
+    alignedLastHalf = topDownPass(string1LenRemainder, optAlignmentY2, inputString1Reversed, inputString2Reversed, memoizedArray2)
+    lastHalfX = "".join((alignedLastHalf[0]))       #don't have to reverse bc the array had reversed X and Y already
+    lastHalfY = "".join((alignedLastHalf[1]))
+
+    #conquer - concatenating the string
+    fullyAlignedX = firstHalfX + lastHalfX
+    fullyAlignedY = firstHalfY + lastHalfY'''
+    
+    #write to file
+    '''f = open(os.path.join(cwd, sys.argv[2]), "w")                                                #ex: 2nd CLA could be basicAlgOutput.txt
+    f.write("%d\n" % costOfOptimalAlignment)
+    f.write(fullyAlignedX + "\n" + fullyAlignedY + "\n")
+    f.write("%f\n" % time_wrapper())
+    f.write("%f\n" % process_memory())
+    f.close()'''
+
+
+
+
+
+#potential scrap
 def topDownPass(string1Len: int, optAlignmentInY: int, inputString1: str, inputString2: str, memoizedArray: list) -> list:
     m, n = string1Len, optAlignmentInY
     alignedString1, alignedString2 = "", ""
@@ -85,53 +139,3 @@ def topDownPass(string1Len: int, optAlignmentInY: int, inputString1: str, inputS
             alignedString2 += "_"                                    #alignedString2 += inputString2[n-1]
             m -= 1       
     return [alignedString1, alignedString2]                                            #n -= 1
-
-
-if __name__ == "__main__":             #main driver
-    inputs = inputStringGenerator()
-    inputString1 = inputs[0]
-    inputString2 = inputs[1]
-
-    string1Len = len(inputString1)
-    string2Len = len(inputString2)
-    inputString1Reversed = "".join(reversed(inputString1))
-    inputString2Reversed = "".join(reversed(inputString2))
-    #print(inputs[0] + "\n" + inputs[1])
-
-    #divide - half of X and all of Y
-    string1LenHalved = string1Len//2
-    string1LenRemainder = string1Len - string1LenHalved
-    memoizedArray1 = bottomUpPass(string1LenHalved, string2Len, inputString1, inputString2)                                                      #first half of X
-    memoizedArray2 = bottomUpPass(string1LenRemainder, string2Len, inputString1Reversed, inputString2Reversed)   #last half of X
-    
-    #add and find min for optimal splitting point (min cost of alignment for split). final col of each array contains opt costs of alignment.
-    costOfAlignmentArr = []
-    for i in range (string2Len +1): 
-        costOfAlignmentArr.append(memoizedArray1[i][string1LenHalved] + memoizedArray2[string2Len-i][string1LenRemainder]) #(k chars of Y) + (n-k chars of Y)
-    costOfOptimalAlignment = min(costOfAlignmentArr)
-    optAlignmentY1 = costOfAlignmentArr.index(costOfOptimalAlignment)
-    optAlignmentY2 = string2Len - optAlignmentY1
-
-    #topdown for first half
-    alignedFirstHalf = topDownPass(string1LenHalved, optAlignmentY1, inputString1, inputString2, memoizedArray1)
-    firstHalfX = "".join(reversed(alignedFirstHalf[0]))
-    firstHalfY = "".join(reversed(alignedFirstHalf[1]))
-
-    #topdown for last half
-    alignedLastHalf = topDownPass(string1LenRemainder, optAlignmentY2, inputString1Reversed, inputString2Reversed, memoizedArray2)
-    lastHalfX = "".join((alignedLastHalf[0]))       #don't have to reverse bc the array had reversed X and Y already
-    lastHalfY = "".join((alignedLastHalf[1]))
-
-    #conquer - concatenating the string
-    fullyAlignedX = firstHalfX + lastHalfX
-    fullyAlignedY = firstHalfY + lastHalfY
-    
-    #write to file
-    f = open(os.path.join(cwd, sys.argv[2]), "w")                                                #ex: 2nd CLA could be basicAlgOutput.txt
-    f.write("%d\n" % costOfOptimalAlignment)
-    f.write(fullyAlignedX + "\n" + fullyAlignedY + "\n")
-    f.write("%f\n" % time_wrapper())
-    f.write("%f\n" % process_memory())
-    f.close()
-
-    
