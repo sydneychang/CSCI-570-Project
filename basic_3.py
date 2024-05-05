@@ -64,12 +64,12 @@ def topDownPass() -> list:
     alignedString1, alignedString2 = "", ""
     
     while(m > 0 or n > 0): 
-        if memoizedArray[n][m] == memoizedArray[n-1][m-1] + mismatchCosts[inputString1[m-1]][inputString2[n-1]]:
+        if memoizedArray[n][m] == memoizedArray[n-1][m-1] + mismatchCosts[inputString1[m-1]][inputString2[n-1]] and n > 0 and m > 0:
             alignedString1 += inputString1[m-1] 
             alignedString2 += inputString2[n-1]
             m -= 1   
             n -= 1
-        elif memoizedArray[n][m] == memoizedArray[n-1][m] + delta:   #elif memoizedArray[n][m] == memoizedArray[n][m-1] + delta:
+        elif memoizedArray[n][m] == memoizedArray[n-1][m] + delta and n > 0:   #elif memoizedArray[n][m] == memoizedArray[n][m-1] + delta:
             alignedString1 += "_"                                    #alignedString1 += inputString1[m-1]
             alignedString2 += inputString2[n-1]                      #alignedString2 += "_"
             n -= 1                                                   #m -= 1

@@ -69,12 +69,12 @@ def basicAlgorithm(string1Len: int, string2Len: int, inputString1: str, inputStr
     alignedString1, alignedString2 = "", ""
     
     while(m > 0 or n > 0): 
-        if memoizedArray[n][m] == memoizedArray[n-1][m-1] + mismatchCosts[inputString1[m-1]][inputString2[n-1]]:
+        if memoizedArray[n][m] == memoizedArray[n-1][m-1] + mismatchCosts[inputString1[m-1]][inputString2[n-1]] and n > 0 and m > 0:
             alignedString1 += inputString1[m-1] 
             alignedString2 += inputString2[n-1]
             m -= 1   
             n -= 1
-        elif memoizedArray[n][m] == memoizedArray[n-1][m] + delta:   #elif memoizedArray[n][m] == memoizedArray[n][m-1] + delta:
+        elif memoizedArray[n][m] == memoizedArray[n-1][m] + delta and n > 0:   #elif memoizedArray[n][m] == memoizedArray[n][m-1] + delta:
             alignedString1 += "_"                                    #alignedString1 += inputString1[m-1]
             alignedString2 += inputString2[n-1]                      #alignedString2 += "_"
             n -= 1                                                   #m -= 1
@@ -87,11 +87,11 @@ def basicAlgorithm(string1Len: int, string2Len: int, inputString1: str, inputStr
 def findAlignment(string1: str, string2: str) -> tuple[str, str]:
     if(len(string1) == 0):             #base cases
         output = ""  
-        for x in string2: output += "_"                
+        for x in string2: output += "_"             
         return (output, string2)
     elif(len(string2) == 0):
         output = ""  
-        for x in string1: output += "_"                
+        for x in string1: output += "_"             
         return (string1, output)
     elif(len(string1) == 1 or len(string2) == 1):
         return basicAlgorithm(len(string1), len(string2), string1, string2)
@@ -146,7 +146,7 @@ if __name__ == "__main__":             #main driver
     string2Len = len(inputStringY)
     inputString1Reversed = "".join(reversed(inputStringX))
     inputString2Reversed = "".join(reversed(inputStringY))
-    print(inputs[0] + "\n" + inputs[1])
+    #print(inputs[0] + "\n" + inputs[1])
 
     alignedStrings = findAlignment(inputStringX, inputStringY)
     print(alignedStrings[0] + "\n")
