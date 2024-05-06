@@ -27,8 +27,20 @@ Using Python3
     - reversed the string to get the result
 
 **memory efficient version**
-- divide and conquer
-- black magic???
+- divide and conquer algorithm 
+    -  the divide part:
+        - getCostOfOptimalAlignments: this was the bottom up pass only utilizing 2 columns in memory. had to switch the "orientation" of the 2D array from x arrays of size 2 > 2 arrays of size y to make it easy to swap array values and iterate over the remaining half of string X.
+        - findOptimalSplitPointInY: this was adding up the final optimal costs generated from running the bottom up passes on X(left) by Y and X(right)-reversed by Y-reversed.
+            - Added the costs using k characters of Y with the right half of X and n-k characters of Y with the left half of X. Found the minimum (cost of optimal solution) and returned the index (the optimal division point of Y)
+            - note that the optimalSplitY's index isn't + 1 to easily deal with edge cases where indices have a value of 0
+    - the conquer part:
+        - called the driver recursively solving the subproblems for both the left half of X + left half of Y up to the optimal split point AND right half of X + remainder of Y
+        - 3 base cases:
+            - if there was no characters in string1, for every character in string2, add a gap to string1
+            - if there was no characters in string2, for every character in string1, add a gap to string2
+            - if either of the strings had length 1, call the basic algorithm defined above to solve the problem trivially (the memory usage would be much less than the m by n array)
+    - the combine part: 
+        - concatenate the strings returned from the recursive calls accordingly
 
 **output file**
 - cost of alignment (int)
