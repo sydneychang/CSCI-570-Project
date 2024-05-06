@@ -31,7 +31,7 @@ def inputStringGenerator() -> list:           #reads from txt file and creates t
     count = 0
     inputString1 = ""
     inputString2 = ""        
-    with open(os.path.join(cwd, "SampleTestCases", sys.argv[1]), "r", encoding="UTF-8") as file:     #ex: 1st CLA could be "input5.txt"
+    with open(os.path.join(cwd, sys.argv[1]), "r", encoding="UTF-8") as file:     #ex: 1st CLA could be "input5.txt"
         while line := file.readline().rstrip():
             if(line.isalpha() and not inputString1): 
                 inputString1 = line
