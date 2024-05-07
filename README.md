@@ -67,6 +67,7 @@ Using Python3
 - for future me:
     - in the .sh files, the $1 and $2 (from the line python3 basic_3.py "$1" "$2") refers to the arguments that you pass in when, for ex, you run ```./basic.sh input1.txt basicAlgOutput.txt``` or ```./efficient.sh input1.txt efficientAlgOutput.txt```
         - those arguments then get funneled into your basic_3.py or efficient_3.py program via sys.argv
+        - you can also run ```./efficient.sh datapoints/in15.txt efficientAlgOutput.txt``` to specify the input directory to read in from. Both basic_3.py and efficient_3.py just expect some path from the cwd. AKA the path to the input file doesn't have to be to the same directory as where the .py files live.
     - if you get the permission denied, run ```chmod +x ./basic.sh``` or ```chmod +x ./efficient.sh```
 
 ## submission
